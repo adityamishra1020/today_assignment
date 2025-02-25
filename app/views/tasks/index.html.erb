@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My To-Do List</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+        }
+        .task-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        .status-badge {
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .status-pending {
+            background-color: #ffcccc;
+            color: #ff0000;
+        }
+        .status-completed {
+            background-color: #ccffcc;
+            color: #008000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center my-4">My To-Do List</h1>
+        <a href="/tasks/new" class="btn btn-primary mb-3">+ Add New Task</a>
+        
+        <div class="alert alert-info" id="progress-tracker">
+            <strong>Progress Tracker</strong>
+            <p><span id="completion-rate">0</span>% Complete</p>
+            <p>Total Tasks: <span id="total-tasks">0</span> | Completed: <span id="completed-tasks">0</span></p>
+        </div>
+
+        <div id="task-list">
+            <% @tasks.each do |task| %>
+                <div class="task-card <%= 'completed' if task.completed %>">
+                    <div class="task-header">
+                        <h5><%= task.title %></h5>
+                        <span class="status-badge <%= task.completed ? 'status-completed' : 'status-pending' %>">
+                            <%= task.completed ? 'Completed ✅' : 'Pending ❌' %>
+                        </span>
+                    </div>
+                    <p><%= task.description %></p>
+                    <p><strong>Priority:</strong> <%= task.priority %></p>
+                    <p><strong>Due Date:</strong> <%= task.due_date.strftime('%d %b %Y') %></p>
+                    <a href="/tasks/<%= task.id %>/edit" class="btn btn-warning btn-sm">Edit</a>
+                    <%= button_to 'Delete', task_path(task), method: :delete, class: 'btn btn-danger btn-sm', data: { confirm: 'Are you sure?' } %>
+                </div>
+            <% end %>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgressTracker();
+        });
+
+        function updateProgressTracker() {
+            const tasks = document.querySelectorAll('.task-card');
+            const totalTasks = tasks.length;
+            let completedTasks = 0;
+
+            tasks.forEach(task => {
+                if (task.classList.contains('completed')) {
+                    completedTasks++;
+                }
+            });
+
+            const completionRate = totalTasks > 0 ? (completedTasks / totalTasks * 100).toFixed(2) : 0;
+            document.getElementById('total-tasks').textContent = totalTasks;
+            document.getElementById('completed-tasks').textContent = completedTasks;
+            document.getElementById('completion-rate').textContent = completionRate;
+        }
+    </script>
+</body>
+</html>
